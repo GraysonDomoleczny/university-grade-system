@@ -1,10 +1,12 @@
 from fastapi import FastAPI, status, HTTPException
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uuid
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 students = {}
@@ -38,6 +40,11 @@ async def validation_exception_handler(request, exc):
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": "Malformed request"},
     )
+
+
+@app.get("/")
+def get_root():
+    return FileResponse("app/templates/index.html")
 
 
 @app.get("/students")

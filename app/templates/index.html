@@ -9,7 +9,7 @@
 	<body>
 		<h1>University Grade Entry System</h1>
 
-		<form>
+		<form id="createStudentForm">
 			<label for="studentName">Name:</label>
 			<input type="text" id="studentName" name="studentName" required />
 
@@ -23,6 +23,7 @@
 
 			<button type="submit" id="createStudent">Create Student</button>
 		</form>
+		<p id="createStudentError"></p>
 
 		<form>
 			<label for="courseName">Name:</label>
@@ -33,40 +34,28 @@
 
 		<form>
 			<label for="enrollmentStudentId">Student ID:</label>
-			<input
-				type="text"
+			<select
 				id="enrollmentStudentId"
 				name="enrollmentStudentId"
 				required
-			/>
+			></select>
 
 			<label for="enrollmentCourseId">Course ID:</label>
-			<input
-				type="text"
+			<select
 				id="enrollmentCourseId"
 				name="enrollmentCourseId"
 				required
-			/>
+			></select>
 
 			<button type="submit" id="createEnrollment">Enroll Student</button>
 		</form>
 
 		<form>
 			<label for="gradeStudentId">Student ID:</label>
-			<input
-				type="text"
-				id="gradeStudentId"
-				name="gradeStudentId"
-				required
-			/>
+			<select id="gradeStudentId" name="gradeStudentId" required></select>
 
 			<label for="gradeCourseId">Course ID:</label>
-			<input
-				type="text"
-				id="gradeCourseId"
-				name="gradeCourseId"
-				required
-			/>
+			<select id="gradeCourseId" name="gradeCourseId" required></select>
 
 			<label for="grade">Grade:</label>
 			<input type="number" id="grade" name="grade" required />
@@ -76,7 +65,10 @@
 
 		<section>
 			<h2>Students and Grades</h2>
-			<div id="studentList"></div>
+			<ul id="studentsList"></ul>
+			<p id="loadStudentsError"></p>
 		</section>
+
+		<script src="/static/script.js"></script>
 	</body>
 </html>
