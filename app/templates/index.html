@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>University Grade Entry System</title>
+	</head>
+
+	<body>
+		<h1>University Grade Entry System</h1>
+
+		<form>
+			<label for="studentName">Name:</label>
+			<input type="text" id="studentName" name="studentName" required />
+
+			<label for="studentEmail">Email:</label>
+			<input
+				type="email"
+				id="studentEmail"
+				name="studentEmail"
+				required
+			/>
+
+			<button type="submit" id="createStudent">Create Student</button>
+		</form>
+
+		<form>
+			<label for="courseName">Name:</label>
+			<input type="text" id="courseName" name="courseName" required />
+
+			<button type="submit" id="createCourse">Create Course</button>
+		</form>
+
+		<form>
+			<label for="enrollmentStudentId">Student ID:</label>
+			<input
+				type="text"
+				id="enrollmentStudentId"
+				name="enrollmentStudentId"
+				required
+			/>
+
+			<label for="enrollmentCourseId">Course ID:</label>
+			<input
+				type="text"
+				id="enrollmentCourseId"
+				name="enrollmentCourseId"
+				required
+			/>
+
+			<button type="submit" id="createEnrollment">Enroll Student</button>
+		</form>
+
+		<form>
+			<label for="gradeStudentId">Student ID:</label>
+			<input
+				type="text"
+				id="gradeStudentId"
+				name="gradeStudentId"
+				required
+			/>
+
+			<label for="gradeCourseId">Course ID:</label>
+			<input
+				type="text"
+				id="gradeCourseId"
+				name="gradeCourseId"
+				required
+			/>
+
+			<label for="grade">Grade:</label>
+			<input type="number" id="grade" name="grade" required />
+
+			<button type="submit" id="createGrade">Record Grade</button>
+		</form>
+
+		<section>
+			<h2>Students and Grades</h2>
+			<div id="studentList"></div>
+		</section>
+	</body>
+</html>
