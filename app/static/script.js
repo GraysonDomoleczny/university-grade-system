@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-	async function sendRequest(url, method, data) {
+	async function sendRequest(url, method = "GET", data = null) {
 		return await fetch(url, {
 			method: method,
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(data),
+			...(data !== null && { body: JSON.stringify(data) }),
 		});
 	}
 
@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			}, 2000);
 			messageElement.style.color = "green";
 		} else {
-			messageElement.textContent = message;
 			messageElement.style.color = "red";
 		}
 	}
@@ -104,6 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			course_id,
 		});
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			createEnrollmentMessage,
 			response.ok
@@ -124,6 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			course_id,
 			grade,
 		});
+
+		if (response.ok) {
+			await loadStudents();
+		}
 
 		displayMessage(
 			createGradeMessage,
@@ -156,7 +163,21 @@ document.addEventListener("DOMContentLoaded", () => {
 				addStudentOption(student, gradeStudentId);
 
 				const li = document.createElement("li");
-				li.textContent = student.name;
+
+				const studentName = document.createElement("p");
+				studentName.textContent = student.name;
+				li.appendChild(studentName);
+
+				const studentEmail = document.createElement("p");
+				studentEmail.textContent = student.email;
+				li.appendChild(studentEmail);
+
+				student.enrollments.forEach((enrollment) => {
+					const studentEnrollment = document.createElement("p");
+					studentEnrollment.textContent = `${enrollment.course_name}: ${enrollment.grade ?? "Not graded"}`;
+					li.appendChild(studentEnrollment);
+				});
+
 				studentsList.appendChild(li);
 			});
 		}
