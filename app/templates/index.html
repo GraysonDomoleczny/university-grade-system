@@ -23,16 +23,17 @@
 
 			<button type="submit" id="createStudent">Create Student</button>
 		</form>
-		<p id="createStudentError"></p>
+		<p id="createStudentMessage"></p>
 
-		<form>
+		<form id="createCourseForm">
 			<label for="courseName">Name:</label>
 			<input type="text" id="courseName" name="courseName" required />
 
 			<button type="submit" id="createCourse">Create Course</button>
 		</form>
+		<p id="createCourseMessage"></p>
 
-		<form>
+		<form id="createEnrollmentForm">
 			<label for="enrollmentStudentId">Student ID:</label>
 			<select
 				id="enrollmentStudentId"
@@ -49,8 +50,9 @@
 
 			<button type="submit" id="createEnrollment">Enroll Student</button>
 		</form>
+		<p id="createEnrollmentMessage"></p>
 
-		<form>
+		<form id="createGradeForm">
 			<label for="gradeStudentId">Student ID:</label>
 			<select id="gradeStudentId" name="gradeStudentId" required></select>
 
@@ -62,11 +64,12 @@
 
 			<button type="submit" id="createGrade">Record Grade</button>
 		</form>
+		<p id="createGradeMessage"></p>
 
 		<section>
 			<h2>Students and Grades</h2>
 			<ul id="studentsList"></ul>
-			<p id="loadStudentsError"></p>
+			<p id="loadStudentsMessage"></p>
 		</section>
 
 		<script src="/static/script.js"></script>
