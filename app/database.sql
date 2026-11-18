@@ -1,4 +1,5 @@
-CREATE DATABASE IF NOT EXISTS grade_system;
+DROP DATABASE IF EXISTS grade_system;
+CREATE DATABASE grade_system
 USE grade_system;
 
 CREATE TABLE students (
