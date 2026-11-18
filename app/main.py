@@ -1,34 +1,44 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uuid
+from database import SessionLocal
+from models import Student, Course, Enrollment
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
 
 students = {}
 courses = {}
 enrollments = []
 
 
-class Student(BaseModel):
+class StudentCreate(BaseModel):
     name: str
     email: str
 
 
-class Course(BaseModel):
+class CourseCreate(BaseModel):
     name: str
 
 
-class Enrollment(BaseModel):
+class EnrollmentCreate(BaseModel):
     student_id: str
     course_id: str
 
 
-class Grade(BaseModel):
+class GradeCreate(BaseModel):
     student_id: str
     course_id: str
     grade: float
@@ -48,36 +58,47 @@ def get_root():
 
 
 @app.get("/students")
-def get_students():
-    result = []
+def get_students(db=Depends(get_db)):
+    students = db.query(Student).all()
 
-    for student_id, student in students.items():
-        student_enrollments = [
-            {
-                "course_name": courses[enrollment["course_id"]]["name"],
-                "grade": enrollment["grade"],
-            }
-            for enrollment in enrollments
-            if enrollment["student_id"] == student_id
-        ]
-
-        result.append(
-            {
-                "id": student_id,
-                "name": student["name"],
-                "email": student["email"],
-                "enrollments": student_enrollments,
-            }
-        )
-
-    return result
+    return [
+        {
+            "id": student.student_id,
+            "name": student.student_name,
+            "email": student.student_email,
+            "enrollments": [
+                {
+                    "course_name": db.query(Course)
+                    .filter(Course.course_id == enrollment.course_id)
+                    .one()
+                    .course_name,
+                    "grade": enrollment.grade,
+                }
+                for enrollment in db.query(Enrollment)
+                .filter(Enrollment.student_id == student.student_id)
+                .all()
+            ],
+        }
+        for student in students
+    ]
 
 
 @app.post("/students", status_code=status.HTTP_201_CREATED)
-def create_student(student: Student):
-    student_id = str(uuid.uuid4())
-    students[student_id] = {"name": student.name, "email": student.email}
-    return {"id": student_id, "name": student.name, "email": student.email}
+def create_student(student: StudentCreate, db=Depends(get_db)):
+    student = Student(
+        student_id=str(uuid.uuid4()),
+        student_name=student.name,
+        student_email=student.email,
+    )
+
+    db.add(student)
+    db.commit()
+
+    return {
+        "id": student.student_id,
+        "name": student.student_name,
+        "email": student.student_email,
+    }
 
 
 @app.get("/courses")
@@ -89,14 +110,17 @@ def get_courses():
 
 
 @app.post("/courses", status_code=status.HTTP_201_CREATED)
-def create_course(course: Course):
+def create_course(course: CourseCreate, db=Depends(get_db)):
     course_id = str(uuid.uuid4())
-    courses[course_id] = {"name": course.name}
+
+    db.add(Course(course_id=course_id, course_name=course.name))
+    db.commit()
+
     return {"id": course_id, "name": course.name}
 
 
 @app.post("/enrollments", status_code=status.HTTP_201_CREATED)
-def create_enrollment(enrollment: Enrollment):
+def create_enrollment(enrollment: EnrollmentCreate, db=Depends(get_db)):
     if enrollment.student_id not in students:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Student not found"
@@ -106,13 +130,12 @@ def create_enrollment(enrollment: Enrollment):
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
         )
 
-    enrollments.append(
-        {
-            "student_id": enrollment.student_id,
-            "course_id": enrollment.course_id,
-            "grade": None,
-        }
+    db.add(
+        Enrollment(
+            student_id=enrollment.student_id, course_id=enrollment.course_id, grade=None
+        )
     )
+    db.commit()
 
     return {
         "student_id": enrollment.student_id,
@@ -122,7 +145,7 @@ def create_enrollment(enrollment: Enrollment):
 
 
 @app.post("/grades", status_code=status.HTTP_201_CREATED)
-def create_grade(grade: Grade):
+def create_grade(grade: GradeCreate):
     if grade.course_id not in courses:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
