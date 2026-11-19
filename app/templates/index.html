@@ -9,66 +9,201 @@
 	<body>
 		<h1>University Grade Entry System</h1>
 
-		<form id="createStudentForm">
-			<label for="studentName">Name:</label>
-			<input type="text" id="studentName" name="studentName" required />
-
-			<label for="studentEmail">Email:</label>
+		<!-- _________________________STUDENT_________________________ -->
+		<form id="studentCreateForm" novalidate>
+			<label for="studentCreateName">Student Name:</label>
 			<input
-				type="email"
-				id="studentEmail"
-				name="studentEmail"
+				type="text"
+				id="studentCreateName"
+				name="studentCreateName"
 				required
 			/>
-
-			<button type="submit" id="createStudent">Create Student</button>
+			<label for="studentCreateEmail">Student Email:</label>
+			<input
+				type="email"
+				id="studentCreateEmail"
+				name="studentCreateEmail"
+				required
+			/>
+			<button type="submit" id="studentCreateSubmit">
+				Create Student
+			</button>
 		</form>
-		<p id="createStudentMessage"></p>
+		<p id="studentCreateMessage"></p>
 
-		<form id="createCourseForm">
-			<label for="courseName">Name:</label>
-			<input type="text" id="courseName" name="courseName" required />
-
-			<button type="submit" id="createCourse">Create Course</button>
-		</form>
-		<p id="createCourseMessage"></p>
-
-		<form id="createEnrollmentForm">
-			<label for="enrollmentStudentId">Student ID:</label>
+		<form id="studentDeleteForm">
+			<label for="studentDeleteEmail">Student:</label>
 			<select
-				id="enrollmentStudentId"
-				name="enrollmentStudentId"
+				id="studentDeleteEmail"
+				name="studentDeleteEmail"
 				required
 			></select>
+			<button type="submit" id="studentDeleteSubmit">
+				Delete Student
+			</button>
+		</form>
+		<p id="studentDeleteMessage"></p>
 
-			<label for="enrollmentCourseId">Course ID:</label>
+		<form id="studentPatchForm">
+			<label for="studentPatchSelect">Student:</label>
 			<select
-				id="enrollmentCourseId"
-				name="enrollmentCourseId"
+				id="studentPatchSelect"
+				name="studentPatchSelect"
 				required
 			></select>
-
-			<button type="submit" id="createEnrollment">Enroll Student</button>
+			<label for="studentPatchName">Student Name:</label>
+			<input type="text" id="studentPatchName" name="studentPatchName" />
+			<label for="studentPatchEmail">Student Email:</label>
+			<input
+				type="email"
+				id="studentPatchEmail"
+				name="studentPatchEmail"
+			/>
+			<button type="submit" id="studentPatchSubmit">
+				Update Student
+			</button>
 		</form>
-		<p id="createEnrollmentMessage"></p>
+		<p id="studentPatchMessage"></p>
 
-		<form id="createGradeForm">
-			<label for="gradeStudentId">Student ID:</label>
-			<select id="gradeStudentId" name="gradeStudentId" required></select>
-
-			<label for="gradeCourseId">Course ID:</label>
-			<select id="gradeCourseId" name="gradeCourseId" required></select>
-
-			<label for="gradeEntry">Grade:</label>
-			<input type="number" id="gradeEntry" name="gradeEntry" required />
-
-			<button type="submit" id="createGrade">Record Grade</button>
+		<!-- _________________________COURSE_________________________ -->
+		<form id="courseCreateForm">
+			<label for="courseCreateName">Course Name:</label>
+			<input
+				type="text"
+				id="courseCreateName"
+				name="courseCreateName"
+				required
+			/>
+			<button type="submit" id="courseCreateSubmit">Create Course</button>
 		</form>
-		<p id="createGradeMessage"></p>
+		<p id="courseCreateMessage"></p>
 
+		<form id="courseDeleteForm">
+			<label for="courseDeleteName">Course:</label>
+			<select
+				id="courseDeleteName"
+				name="courseDeleteName"
+				required
+			></select>
+			<button type="submit" id="courseDeleteSubmit">Delete Course</button>
+		</form>
+		<p id="courseDeleteMessage"></p>
+
+		<form id="coursePatchForm">
+			<label for="coursePatchSelect">Course:</label>
+			<select
+				id="coursePatchSelect"
+				name="coursePatchSelect"
+				required
+			></select>
+			<label for="coursePatchName">Course Name:</label>
+			<input type="text" id="coursePatchName" name="coursePatchName" />
+			<button type="submit" id="coursePatchSubmit">Update Course</button>
+		</form>
+		<p id="coursePatchMessage"></p>
+
+		<!-- _________________________ENROLLMENT_________________________ -->
+		<form id="enrollmentCreateForm">
+			<label for="enrollmentCreateStudent">Student:</label>
+			<select
+				id="enrollmentCreateStudent"
+				name="enrollmentCreateStudent"
+				required
+			></select>
+			<label for="enrollmentCreateCourse">Course:</label>
+			<select
+				id="enrollmentCreateCourse"
+				name="enrollmentCreateCourse"
+				required
+			></select>
+			<button type="submit" id="enrollmentCreateSubmit">Enroll</button>
+		</form>
+		<p id="enrollmentCreateMessage"></p>
+
+		<form id="enrollmentDeleteForm">
+			<label for="enrollmentDeleteStudent">Student:</label>
+			<select
+				id="enrollmentDeleteStudent"
+				name="enrollmentDeleteStudent"
+				required
+			></select>
+			<label for="enrollmentDeleteCourse">Course:</label>
+			<select
+				id="enrollmentDeleteCourse"
+				name="enrollmentDeleteCourse"
+				required
+			></select>
+			<button type="submit" id="enrollmentDeleteSubmit">Unenroll</button>
+		</form>
+		<p id="enrollmentDeleteMessage"></p>
+
+		<!-- _________________________GRADE_________________________ -->
+		<form id="gradeCreateForm">
+			<label for="gradeCreateStudent">Student:</label>
+			<select
+				id="gradeCreateStudent"
+				name="gradeCreateStudent"
+				required
+			></select>
+			<label for="gradeCreateCourse">Course:</label>
+			<select
+				id="gradeCreateCourse"
+				name="gradeCreateCourse"
+				required
+			></select>
+			<label for="gradeCreateGrade">Grade:</label>
+			<input
+				type="number"
+				id="gradeCreateGrade"
+				name="gradeCreateGrade"
+				min="0"
+				max="100"
+				required
+			/>
+			<button type="submit" id="gradeCreateSubmit">Record Grade</button>
+		</form>
+		<p id="gradeCreateMessage"></p>
+
+		<form id="gradeDeleteForm">
+			<label for="gradeDeleteStudent">Student:</label>
+			<select
+				id="gradeDeleteStudent"
+				name="gradeDeleteStudent"
+				required
+			></select>
+			<label for="gradeDeleteCourse">Course:</label>
+			<select
+				id="gradeDeleteCourse"
+				name="gradeDeleteCourse"
+				required
+			></select>
+			<button type="submit" id="gradeDeleteSubmit">Delete Grade</button>
+		</form>
+		<p id="gradeDeleteMessage"></p>
+
+		<form id="gradePatchForm">
+			<label for="gradePatchSelectStudent">Student:</label>
+			<select
+				id="gradePatchSelectStudent"
+				name="gradePatchSelectStudent"
+				required
+			></select>
+			<label for="gradePatchSelectCourse">Course:</label>
+			<select
+				id="gradePatchSelectCourse"
+				name="gradePatchSelectCourse"
+				required
+			></select>
+			<label for="gradePatchGrade">Grade:</label>
+			<input type="text" id="gradePatchGrade" name="gradePatchGrade" />
+			<button type="submit" id="gradePatchSubmit">Update Grade</button>
+		</form>
+		<p id="gradePatchMessage"></p>
+
+		<!-- _________________________STUDENT DISPLAY_________________________ -->
 		<section>
 			<h2>Students and Grades</h2>
-			<ul id="studentsList"></ul>
+			<ul id="loadStudentsList"></ul>
 			<p id="loadStudentsMessage"></p>
 		</section>
 

@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import uuid
 from database import SessionLocal
 from models import Student, Course, Enrollment
+import re
 
 
 def get_db():
@@ -26,12 +27,12 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 class StudentCreate(BaseModel):
-    name: str
-    email: str
+    student_name: str
+    student_email: str
 
 
 class CourseCreate(BaseModel):
-    name: str
+    course_name: str
 
 
 class EnrollmentCreate(BaseModel):
@@ -86,10 +87,27 @@ def get_students(db=Depends(get_db)):
 
 @app.post("/students", status_code=status.HTTP_201_CREATED)
 def create_student(student: StudentCreate, db=Depends(get_db)):
+    student_name = student.student_name.strip()
+    student_email = student.student_email.strip()
+
+    if not student_name:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Student name is required")
+
+    if not student_email:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Student email is required")
+
+    if not re.match(r"^[\w.+-]+@[\w-]+\.[\w.-]+$", student_email):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid email address")
+
+    if db.query(Student).filter(Student.student_email == student_email).first():
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "A student with this email already exists."
+        )
+
     new_student = Student(
         student_id=str(uuid.uuid4()),
-        student_name=student.name,
-        student_email=student.email,
+        student_name=student_name,
+        student_email=student_email,
     )
 
     db.add(new_student)
@@ -102,6 +120,11 @@ def create_student(student: StudentCreate, db=Depends(get_db)):
     }
 
 
+@app.delete("/students")
+def delete_student(student: StudentCreate, db=Depends(get_db)):
+    print()
+
+
 @app.get("/courses")
 def get_courses(db=Depends(get_db)):
     courses = db.query(Course).all()
@@ -111,7 +134,7 @@ def get_courses(db=Depends(get_db)):
 
 @app.post("/courses", status_code=status.HTTP_201_CREATED)
 def create_course(course: CourseCreate, db=Depends(get_db)):
-    new_course = Course(course_id=str(uuid.uuid4()), course_name=course.name)
+    new_course = Course(course_id=str(uuid.uuid4()), course_name=course.course_name)
 
     db.add(new_course)
     db.commit()
