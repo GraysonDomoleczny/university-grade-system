@@ -20,6 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	function populateSelects(entities, dropdowns) {
+		dropdowns.forEach((dropdown) => {
+			dropdown.innerHTML = "";
+
+			entities.forEach((entity) => {
+				const option = document.createElement("option");
+				option.value = entity.id;
+				option.textContent = entity.name;
+
+				dropdown.appendChild(option);
+			});
+		});
+	}
+
 	// _________________________Student elements_________________________
 	const studentCreateForm = document.getElementById("studentCreateForm");
 	const studentCreateName = document.getElementById("studentCreateName");
@@ -129,6 +143,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			studentCreateName.value = "";
+			studentCreateEmail.value = "";
+			await loadStudents();
+		}
+
 		displayMessage(
 			studentCreateMessage,
 			response.ok
@@ -136,12 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to create student. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			studentCreateName.value = "";
-			studentCreateEmail.value = "";
-			await loadStudents();
-		}
 	});
 
 	studentDeleteForm.addEventListener("submit", async (event) => {
@@ -153,6 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			studentDeleteMessage,
 			response.ok
@@ -160,10 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to delete student. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await loadStudents();
-		}
 	});
 
 	studentPatchForm.addEventListener("submit", async (event) => {
@@ -189,6 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			studentPatchName.value = "";
+			studentPatchEmail.value = "";
+			await loadStudents();
+		}
+
 		displayMessage(
 			studentPatchMessage,
 			response.ok
@@ -196,12 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to update student. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			studentPatchName.value = "";
-			studentPatchEmail.value = "";
-			await loadStudents();
-		}
 	});
 
 	// _________________________Course endpoints_________________________
@@ -214,6 +228,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			courseCreateName.value = "";
+			await loadCourses();
+		}
+
 		displayMessage(
 			courseCreateMessage,
 			response.ok
@@ -221,11 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to create course. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			courseCreateName.value = "";
-			await loadCourses();
-		}
 	});
 
 	courseDeleteForm.addEventListener("submit", async (event) => {
@@ -237,6 +251,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await Promise.all([loadCourses(), loadStudents()]);
+		}
+
 		displayMessage(
 			courseDeleteMessage,
 			response.ok
@@ -244,10 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to delete course. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await Promise.all([loadCourses(), loadStudents()]);
-		}
 	});
 
 	coursePatchForm.addEventListener("submit", async (event) => {
@@ -262,6 +276,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			coursePatchName.value = "";
+			await Promise.all([loadCourses(), loadStudents()]);
+		}
+
 		displayMessage(
 			coursePatchMessage,
 			response.ok
@@ -269,11 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to update course. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			coursePatchName.value = "";
-			await Promise.all([loadCourses(), loadStudents()]);
-		}
 	});
 
 	// _________________________Enrollment endpoints_________________________
@@ -290,6 +304,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			enrollmentCreateMessage,
 			response.ok
@@ -297,10 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to enroll student. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await loadStudents();
-		}
 	});
 
 	enrollmentDeleteForm.addEventListener("submit", async (event) => {
@@ -316,6 +330,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			enrollmentDeleteMessage,
 			response.ok
@@ -324,10 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
 						"Failed to unenroll student. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await loadStudents();
-		}
 	});
 
 	// _________________________Grade endpoints_________________________
@@ -346,6 +360,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			gradeCreateGrade.value = "";
+			await loadStudents();
+		}
+
 		displayMessage(
 			gradeCreateMessage,
 			response.ok
@@ -353,11 +372,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to assign grade. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			gradeCreateGrade.value = "";
-			await loadStudents();
-		}
 	});
 
 	gradeDeleteForm.addEventListener("submit", async (event) => {
@@ -373,6 +387,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			gradeDeleteMessage,
 			response.ok
@@ -380,10 +398,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to delete grade. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await loadStudents();
-		}
 	});
 
 	gradePatchForm.addEventListener("submit", async (event) => {
@@ -401,6 +415,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const data = await response.json();
 
+		if (response.ok) {
+			await loadStudents();
+		}
+
 		displayMessage(
 			gradePatchMessage,
 			response.ok
@@ -408,33 +426,32 @@ document.addEventListener("DOMContentLoaded", () => {
 				: data.detail || "Failed to update grade. Please try again.",
 			response.ok,
 		);
-
-		if (response.ok) {
-			await loadStudents();
-		}
 	});
 
 	async function loadStudents() {
-		function addStudentOption(student, dropdown) {
-			const option = document.createElement("option");
-			option.value = student.id;
-			option.textContent = student.name;
-			dropdown.appendChild(option);
-		}
-
 		const response = await sendRequest("/students");
 
 		if (response.ok) {
 			const students = await response.json();
+
 			students.sort((a, b) => a.name.localeCompare(b.name));
 
-			enrollmentStudentId.innerHTML = "";
-			gradeStudentId.innerHTML = "";
-			studentsList.innerHTML = "";
-			students.forEach((student) => {
-				addStudentOption(student, enrollmentStudentId);
-				addStudentOption(student, gradeStudentId);
+			populateSelects(
+				students,
+				(studentSelects = [
+					studentDeleteSelect,
+					studentPatchSelect,
+					enrollmentCreateSelectStudent,
+					enrollmentDeleteSelectStudent,
+					gradeCreateSelectStudent,
+					gradeDeleteSelectStudent,
+					gradePatchSelectStudent,
+				]),
+			);
 
+			loadStudentsList.innerHTML = "";
+
+			students.forEach((student) => {
 				const li = document.createElement("li");
 
 				const studentName = document.createElement("p");
@@ -451,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					li.appendChild(studentEnrollment);
 				});
 
-				studentsList.appendChild(li);
+				loadStudentsList.appendChild(li);
 			});
 		}
 
@@ -465,25 +482,25 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	async function loadCourses() {
-		function addCourseOption(course, dropdown) {
-			const option = document.createElement("option");
-			option.value = course.id;
-			option.textContent = course.name;
-			dropdown.appendChild(option);
-		}
-
 		const response = await sendRequest("/courses");
 
 		if (response.ok) {
 			const courses = await response.json();
+
 			courses.sort((a, b) => a.name.localeCompare(b.name));
 
-			enrollmentCourseId.innerHTML = "";
-			gradeCourseId.innerHTML = "";
-			courses.forEach((course) => {
-				addCourseOption(course, enrollmentCourseId);
-				addCourseOption(course, gradeCourseId);
-			});
+			populateSelects(
+				courses,
+				(courseSelects = [
+					courseDeleteSelect,
+					coursePatchSelect,
+					enrollmentCreateSelectCourse,
+					enrollmentDeleteSelectCourse,
+					gradeCreateSelectCourse,
+					gradeDeleteSelectCourse,
+					gradePatchSelectCourse,
+				]),
+			);
 		}
 	}
 

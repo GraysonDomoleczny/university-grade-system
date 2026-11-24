@@ -61,8 +61,6 @@ def get_root():
 
 @app.get("/students")
 def get_students(db=Depends(get_db)):
-    students = db.query(Student).all()
-
     return [
         {
             "id": student.student_id,
@@ -81,7 +79,7 @@ def get_students(db=Depends(get_db)):
                 .all()
             ],
         }
-        for student in students
+        for student in db.query(Student).all()
     ]
 
 
