@@ -1,12 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-	async function sendRequest(url, method = "GET", data = null) {
-		return await fetch(url, {
-			method: method,
-			headers: { "Content-Type": "application/json" },
-			...(data !== null && { body: JSON.stringify(data) }),
-		});
-	}
+import { sendRequest } from "./api.js";
 
+document.addEventListener("DOMContentLoaded", () => {
 	function displayMessage(messageElement, message, isSuccess) {
 		clearTimeout(messageElement.timeout);
 
@@ -32,6 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
 				dropdown.appendChild(option);
 			});
 		});
+	}
+
+	function getLetterGrade(grade) {
+		grade = grade.toFixed(2);
+
+		if (grade >= 90) return `A - ${grade}%`;
+		if (grade >= 80) return `B - ${grade}%`;
+		if (grade >= 70) return `C - ${grade}%`;
+		if (grade >= 60) return `D - ${grade}%`;
+
+		return `F - ${grade}%`;
 	}
 
 	// _________________________Student elements_________________________
@@ -109,9 +114,22 @@ document.addEventListener("DOMContentLoaded", () => {
 		"enrollmentPatchMessage",
 	);
 
-	// _________________________Student display_________________________
+	// _________________________Display_________________________
+	const studentSearchForm = document.getElementById("studentSearchForm");
+	const studentSearchInput = document.getElementById("studentSearchInput");
 	const loadStudentsList = document.getElementById("loadStudentsList");
 	const loadStudentsMessage = document.getElementById("loadStudentsMessage");
+
+	const courseSummaryList = document.getElementById("courseSummaryList");
+	const courseSummaryMessage = document.getElementById(
+		"courseSummaryMessage",
+	);
+
+	const studentFilterSelect = document.getElementById("studentFilterSelect");
+	const studentFilterInput = document.getElementById("studentFilterInput");
+	const studentFilterMessage = document.getElementById(
+		"studentFilterMessage",
+	);
 
 	// _________________________Student endpoints_________________________
 	studentCreateForm.addEventListener("submit", async (event) => {
@@ -144,6 +162,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	studentDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (
+			!confirm(`Are you sure you want to delete ${
+				studentDeleteSelect.selectedOptions[0].textContent
+			}
+			?`)
+		) {
+			return;
+		}
 
 		const student_id = studentDeleteSelect.value;
 
@@ -229,6 +256,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	courseDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
+		if (
+			!confirm(`Are you sure you want to delete ${
+				courseDeleteSelect.selectedOptions[0].textContent
+			}
+			?`)
+		) {
+			return;
+		}
+
 		const course_id = courseDeleteSelect.value;
 
 		const response = await sendRequest(`/courses/${course_id}`, "DELETE");
@@ -304,6 +340,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	enrollmentDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
+		if (
+			!confirm(
+				`Are you sure you want to unenroll ${
+					enrollmentDeleteSelectStudent.selectedOptions[0].textContent
+				} from ${
+					enrollmentDeleteSelectCourse.selectedOptions[0].textContent
+				}?`,
+			)
+		) {
+			return;
+		}
+
 		const student_id = enrollmentDeleteSelectStudent.value;
 		const course_id = enrollmentDeleteSelectCourse.value;
 
@@ -363,11 +411,23 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	// _________________________Populate data_________________________
-	async function loadStudents() {
-		const response = await sendRequest("/students");
+	studentSearchForm.addEventListener("submit", async (event) => {
+		event.preventDefault();
+
+		const searchValue = studentSearchInput.value;
+
+		loadStudents(searchValue);
+	});
+
+	async function loadStudents(searchValue = "") {
+		const response = await sendRequest(
+			`/students?search_value=${encodeURIComponent(searchValue)}`,
+		);
+
+		const data = await response.json();
 
 		if (response.ok) {
-			const students = await response.json();
+			const students = data;
 
 			students.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -396,21 +456,44 @@ document.addEventListener("DOMContentLoaded", () => {
 				studentEmail.textContent = student.email;
 				li.appendChild(studentEmail);
 
+				let gradeSum = 0;
+				let gradeCount = 0;
 				student.enrollments.forEach((enrollment) => {
+					if (Number.isFinite(enrollment.grade)) {
+						gradeSum += enrollment.grade;
+						gradeCount++;
+					}
+
 					const studentEnrollment = document.createElement("p");
-					studentEnrollment.textContent = `${enrollment.course_name}: ${enrollment.grade ?? "Not graded"}`;
+					const gradeDisplay =
+						enrollment.grade === null
+							? "Not graded"
+							: getLetterGrade(enrollment.grade);
+
+					studentEnrollment.textContent = `${enrollment.course_name}: ${gradeDisplay}`;
 					li.appendChild(studentEnrollment);
 				});
 
+				const avgGrade = document.createElement("p");
+				const avgDisplay =
+					gradeCount === 0
+						? "N/A"
+						: getLetterGrade(gradeSum / gradeCount);
+
+				avgGrade.textContent = `Average Grade: ${avgDisplay}`;
+				li.appendChild(avgGrade);
+
 				loadStudentsList.appendChild(li);
 			});
+		} else {
+			loadStudentsList.innerHTML = "";
 		}
 
 		displayMessage(
 			loadStudentsMessage,
 			response.ok
 				? "Successfully loaded students."
-				: "Failed to load students.",
+				: data.detail || "Failed to load students.",
 			response.ok,
 		);
 	}

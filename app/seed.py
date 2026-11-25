@@ -1,7 +1,8 @@
-from database import SessionLocal
-from models import Student, Course, Enrollment
+from app.database import SessionLocal
+from app.models import DBStudent, DBCourse, DBEnrollment
 import uuid
 import sys
+import random
 
 student_data = [
     ("John Smith", "john.smith@example.com"),
@@ -29,36 +30,24 @@ course_data = [
     "Information Systems",
 ]
 
-enrollment_data = [
-    (0, 0, 92.5),
-    (0, 1, 87.0),
-    (1, 0, 95.0),
-    (1, 2, 89.5),
-    (2, 1, 78.0),
-    (2, 3, 84.5),
-    (3, 2, 96.0),
-    (3, 4, 91.0),
-    (4, 3, 88.5),
-    (4, 5, 79.0),
-    (5, 4, 93.0),
-    (5, 6, 86.5),
-    (6, 5, 82.0),
-    (6, 7, 90.5),
-    (7, 6, 97.0),
-    (7, 8, 88.0),
-    (8, 7, 85.5),
-    (8, 9, 92.0),
-    (9, 8, 94.5),
-    (9, 9, 81.0),
-]
+
+enrollment_data: list[tuple[int, int, float]] = []
+
+for student_index in range(len(student_data)):
+    enrollment_count = random.randint(0, 6)
+    enrolled_courses = random.sample(range(len(course_data)), enrollment_count)
+
+    for course_index in enrolled_courses:
+        grade = round(random.uniform(50, 100), 2)
+        enrollment_data.append((student_index, course_index, grade))
 
 
 db = SessionLocal()
 
 try:
     if (
-        db.query(Student)
-        .filter(Student.student_email == "john.smith@example.com")
+        db.query(DBStudent)
+        .filter(DBStudent.student_email == "john.smith@example.com")
         .first()
         is not None
     ):
@@ -66,7 +55,7 @@ try:
         sys.exit()
 
     students = [
-        Student(
+        DBStudent(
             student_id=str(uuid.uuid4()),
             student_name=name,
             student_email=email,
@@ -75,11 +64,11 @@ try:
     ]
 
     courses = [
-        Course(course_id=str(uuid.uuid4()), course_name=name) for name in course_data
+        DBCourse(course_id=str(uuid.uuid4()), course_name=name) for name in course_data
     ]
 
     enrollments = [
-        Enrollment(
+        DBEnrollment(
             student_id=students[student_index].student_id,
             course_id=courses[course_index].course_id,
             grade=grade,

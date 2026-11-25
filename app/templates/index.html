@@ -171,13 +171,44 @@
 		</form>
 		<p id="enrollmentPatchMessage"></p>
 
-		<!-- _________________________STUDENT DISPLAY_________________________ -->
+		<!-- _________________________DISPLAY_________________________ -->
 		<section>
-			<h2>Students and Grades</h2>
+			<h2>Students</h2>
+			<form id="studentSearchForm">
+				<label for="studentSearchInput">Seach by name:</label>
+				<input
+					type="text"
+					id="studentSearchInput"
+					name="studentSearchInput"
+				/>
+				<button type="submit">Search Students</button>
+			</form>
 			<ul id="loadStudentsList"></ul>
 			<p id="loadStudentsMessage"></p>
 		</section>
 
-		<script src="/static/script.js"></script>
+		<section>
+			<h2>Course Summary</h2>
+			<ul id="courseSummaryList"></ul>
+			<p id="courseSummaryMessage"></p>
+		</section>
+
+		<section>
+			<h2>Student Filter</h2>
+			<select
+				id="studentFilterSelect"
+				name="studentFilterSelect"
+				required
+			>
+				<option value="" disabled selected>Select a filter</option>
+				<option value="name">Name</option>
+				<option value="grade">Grade</option>
+				<option value="course">Course</option>
+			</select>
+			<div id="studentFilterInput"></div>
+			<p id="studentFilterMessage"></p>
+		</section>
+
+		<script type="module" src="/static/script.js"></script>
 	</body>
 </html>

@@ -64,7 +64,19 @@ def get_root():
 
 
 @app.get("/students")
-def get_students(db=Depends(get_db)):
+def get_students(search_value: str | None = None, db=Depends(get_db)):
+    student_query = db.query(DBStudent)
+
+    if search_value:
+        student_query = student_query.filter(
+            DBStudent.student_name.ilike(f"%{search_value}%")
+        )
+
+    students = student_query.all()
+
+    if not students:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No students match your search.")
+
     return [
         {
             "id": student.student_id,
@@ -83,7 +95,7 @@ def get_students(db=Depends(get_db)):
                 .all()
             ],
         }
-        for student in db.query(DBStudent).all()
+        for student in students
     ]
 
 

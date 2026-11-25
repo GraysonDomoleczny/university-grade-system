@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS grade_system;
-CREATE DATABASE grade_system
+CREATE DATABASE grade_system;
 USE grade_system;
 
 CREATE TABLE students (
@@ -19,9 +19,7 @@ CREATE TABLE enrollments (
 	grade FLOAT,
 	PRIMARY KEY (student_id, course_id),
 	CONSTRAINT fk_enrollment_student
-		FOREIGN KEY (student_id) REFERENCES students(student_id),
-		ON DELETE CASCADE,
+		FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
 	CONSTRAINT fk_enrollment_course
-		FOREIGN KEY (course_id) REFERENCES courses(course_id)
-		ON DELETE CASCADE
+		FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
