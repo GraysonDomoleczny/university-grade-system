@@ -120,10 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	const loadStudentsList = document.getElementById("loadStudentsList");
 	const loadStudentsMessage = document.getElementById("loadStudentsMessage");
 
-	const courseSummaryList = document.getElementById("courseSummaryList");
-	const courseSummaryMessage = document.getElementById(
-		"courseSummaryMessage",
+	const summaryAverageGrade = document.getElementById("summaryAverageGrade");
+	const summaryGradeDistribution = document.getElementById(
+		"summaryGradeDistribution",
 	);
+	const summaryMessage = document.getElementById("summaryMessage");
 
 	const studentFilterSelect = document.getElementById("studentFilterSelect");
 	const studentFilterInput = document.getElementById("studentFilterInput");
@@ -142,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			student_name,
 			student_email,
 		});
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -175,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		const student_id = studentDeleteSelect.value;
 
 		const response = await sendRequest(`/students/${student_id}`, "DELETE");
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -211,7 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			student_name,
 			student_email,
 		});
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -236,7 +234,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		const course_name = courseCreateName.value;
 
 		const response = await sendRequest("/courses", "POST", { course_name });
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -268,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		const course_id = courseDeleteSelect.value;
 
 		const response = await sendRequest(`/courses/${course_id}`, "DELETE");
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -293,7 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		const response = await sendRequest(`/courses/${course_id}`, "PATCH", {
 			course_name,
 		});
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -321,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			student_id,
 			course_id,
 		});
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -359,7 +353,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			`/enrollments/${student_id}/${course_id}`,
 			"DELETE",
 		);
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -394,7 +387,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			"PATCH",
 			{ grade },
 		);
-
 		const data = await response.json();
 
 		if (response.ok) {
@@ -423,12 +415,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		const response = await sendRequest(
 			`/students?search_value=${encodeURIComponent(searchValue)}`,
 		);
-
-		const data = await response.json();
+		const students = await response.json();
 
 		if (response.ok) {
-			const students = data;
-
 			students.sort((a, b) => a.name.localeCompare(b.name));
 
 			populateSelects(
@@ -493,17 +482,16 @@ document.addEventListener("DOMContentLoaded", () => {
 			loadStudentsMessage,
 			response.ok
 				? "Successfully loaded students."
-				: data.detail || "Failed to load students.",
+				: students.detail || "Failed to load students.",
 			response.ok,
 		);
 	}
 
 	async function loadCourses() {
 		const response = await sendRequest("/courses");
+		const courses = await response.json();
 
 		if (response.ok) {
-			const courses = await response.json();
-
 			courses.sort((a, b) => a.name.localeCompare(b.name));
 
 			populateSelects(
@@ -520,6 +508,35 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	async function loadCourseSummary() {
+		const response = await sendRequest("/courses/summary");
+		const courseSummary = await response.json();
+
+		if (response.ok) {
+			summaryAverageGrade.textContent = "";
+			summaryGradeDistribution.textContent = "";
+
+			summaryAverageGrade.textContent = `Average Grade: ${
+				courseSummary.average_grade
+			}%`;
+
+			courseSummary.grade_distribution.forEach((grade) => {
+				const li = document.createElement("li");
+				li.textContent = grade;
+				summaryGradeDistribution.appendChild(li);
+			});
+		}
+
+		displayMessage(
+			summaryMessage,
+			response.ok
+				? "Successfully loaded course summary."
+				: courseSummary.detail || "Failed to load course summary.",
+			response.ok,
+		);
+	}
+
 	loadStudents();
 	loadCourses();
+	loadCourseSummary();
 });

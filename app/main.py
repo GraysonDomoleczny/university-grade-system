@@ -327,3 +327,46 @@ def update_grade(
 
     db_enrollment.grade = grade
     db.commit()
+
+
+@app.get("/courses/summary")
+def get_course_summary(db=Depends(get_db)):
+    enrollments = db.query(DBEnrollment).all()
+
+    grade_total = 0
+    grade_distribution = {
+        "A": 0,
+        "B": 0,
+        "C": 0,
+        "D": 0,
+        "F": 0,
+    }
+
+    for enrollment in enrollments:
+        if enrollment.grade is None:
+            continue
+
+        grade_total += enrollment.grade
+
+        if enrollment.grade >= 90:
+            grade_distribution["A"] += 1
+        elif enrollment.grade >= 80:
+            grade_distribution["B"] += 1
+        elif enrollment.grade >= 70:
+            grade_distribution["C"] += 1
+        elif enrollment.grade >= 60:
+            grade_distribution["D"] += 1
+        else:
+            grade_distribution["F"] += 1
+
+    grade_count = sum(grade_distribution.values())
+
+    if grade_count == 0:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No grades found to summarize.")
+
+    return {
+        "average_grade": round(grade_total / grade_count, 2),
+        "grade_distribution": [
+            f"{grade}: {count}" for grade, count in grade_distribution.items()
+        ],
+    }
