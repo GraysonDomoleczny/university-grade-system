@@ -20,6 +20,8 @@ CREATE TABLE enrollments (
 	PRIMARY KEY (student_id, course_id),
 	CONSTRAINT fk_enrollment_student
 		FOREIGN KEY (student_id) REFERENCES students(student_id),
+		ON DELETE CASCADE,
 	CONSTRAINT fk_enrollment_course
 		FOREIGN KEY (course_id) REFERENCES courses(course_id)
+		ON DELETE CASCADE
 );

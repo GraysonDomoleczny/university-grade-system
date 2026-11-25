@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
-	function populateSelects(entities, dropdowns) {
+	function populateSelects(entities, dropdowns, placeholder) {
 		dropdowns.forEach((dropdown) => {
-			dropdown.innerHTML = "";
+			dropdown.innerHTML = `<option value="" disabled selected>Select a ${placeholder}</option>`;
 
 			entities.forEach((entity) => {
 				const option = document.createElement("option");
@@ -95,35 +95,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		"enrollmentDeleteMessage",
 	);
 
-	// _________________________Grade elements_________________________
-	const gradeCreateForm = document.getElementById("gradeCreateForm");
-	const gradeCreateSelectStudent = document.getElementById(
-		"gradeCreateSelectStudent",
+	const enrollmentPatchForm = document.getElementById("enrollmentPatchForm");
+	const enrollmentPatchSelectStudent = document.getElementById(
+		"enrollmentPatchSelectStudent",
 	);
-	const gradeCreateSelectCourse = document.getElementById(
-		"gradeCreateSelectCourse",
+	const enrollmentPatchSelectCourse = document.getElementById(
+		"enrollmentPatchSelectCourse",
 	);
-	const gradeCreateGrade = document.getElementById("gradeCreateGrade");
-	const gradeCreateMessage = document.getElementById("gradeCreateMessage");
-
-	const gradeDeleteForm = document.getElementById("gradeDeleteForm");
-	const gradeDeleteSelectStudent = document.getElementById(
-		"gradeDeleteSelectStudent",
+	const enrollmentPatchGrade = document.getElementById(
+		"enrollmentPatchGrade",
 	);
-	const gradeDeleteSelectCourse = document.getElementById(
-		"gradeDeleteSelectCourse",
+	const enrollmentPatchMessage = document.getElementById(
+		"enrollmentPatchMessage",
 	);
-	const gradeDeleteMessage = document.getElementById("gradeDeleteMessage");
-
-	const gradePatchForm = document.getElementById("gradePatchForm");
-	const gradePatchSelectStudent = document.getElementById(
-		"gradePatchSelectStudent",
-	);
-	const gradePatchSelectCourse = document.getElementById(
-		"gradePatchSelectCourse",
-	);
-	const gradePatchGrade = document.getElementById("gradePatchGrade");
-	const gradePatchMessage = document.getElementById("gradePatchMessage");
 
 	// _________________________Student display_________________________
 	const loadStudentsList = document.getElementById("loadStudentsList");
@@ -344,71 +328,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	});
 
-	// _________________________Grade endpoints_________________________
-	gradeCreateForm.addEventListener("submit", async (event) => {
+	enrollmentPatchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
-		const student_id = gradeCreateSelectStudent.value;
-		const course_id = gradeCreateSelectCourse.value;
-		const grade = Number(gradeCreateGrade.value);
+		const student_id = enrollmentPatchSelectStudent.value;
+		const course_id = enrollmentPatchSelectCourse.value;
 
-		const response = await sendRequest("/grades", "POST", {
-			student_id,
-			course_id,
-			grade,
-		});
-
-		const data = await response.json();
-
-		if (response.ok) {
-			gradeCreateGrade.value = "";
-			await loadStudents();
+		if (enrollmentPatchGrade.value.trim() === "") {
+			displayMessage(enrollmentPatchMessage, "Grade is required.", false);
+			return;
 		}
 
-		displayMessage(
-			gradeCreateMessage,
-			response.ok
-				? "Successfully assigned grade."
-				: data.detail || "Failed to assign grade. Please try again.",
-			response.ok,
-		);
-	});
-
-	gradeDeleteForm.addEventListener("submit", async (event) => {
-		event.preventDefault();
-
-		const student_id = gradeDeleteSelectStudent.value;
-		const course_id = gradeDeleteSelectCourse.value;
+		const grade = Number(enrollmentPatchGrade.value);
 
 		const response = await sendRequest(
-			`/grades/${student_id}/${course_id}`,
-			"DELETE",
-		);
-
-		const data = await response.json();
-
-		if (response.ok) {
-			await loadStudents();
-		}
-
-		displayMessage(
-			gradeDeleteMessage,
-			response.ok
-				? "Successfully deleted grade."
-				: data.detail || "Failed to delete grade. Please try again.",
-			response.ok,
-		);
-	});
-
-	gradePatchForm.addEventListener("submit", async (event) => {
-		event.preventDefault();
-
-		const student_id = gradePatchSelectStudent.value;
-		const course_id = gradePatchSelectCourse.value;
-		const grade = Number(gradePatchGrade.value);
-
-		const response = await sendRequest(
-			`/grades/${student_id}/${course_id}`,
+			`/enrollments/${student_id}/${course_id}`,
 			"PATCH",
 			{ grade },
 		);
@@ -420,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		displayMessage(
-			gradePatchMessage,
+			enrollmentPatchMessage,
 			response.ok
 				? "Successfully updated grade."
 				: data.detail || "Failed to update grade. Please try again.",
@@ -428,6 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	});
 
+	// _________________________Populate data_________________________
 	async function loadStudents() {
 		const response = await sendRequest("/students");
 
@@ -438,15 +373,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			populateSelects(
 				students,
-				(studentSelects = [
+				[
 					studentDeleteSelect,
 					studentPatchSelect,
 					enrollmentCreateSelectStudent,
 					enrollmentDeleteSelectStudent,
-					gradeCreateSelectStudent,
-					gradeDeleteSelectStudent,
-					gradePatchSelectStudent,
-				]),
+					enrollmentPatchSelectStudent,
+				],
+				"student",
 			);
 
 			loadStudentsList.innerHTML = "";
@@ -491,15 +425,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			populateSelects(
 				courses,
-				(courseSelects = [
+				[
 					courseDeleteSelect,
 					coursePatchSelect,
 					enrollmentCreateSelectCourse,
 					enrollmentDeleteSelectCourse,
-					gradeCreateSelectCourse,
-					gradeDeleteSelectCourse,
-					gradePatchSelectCourse,
-				]),
+					enrollmentPatchSelectCourse,
+				],
+				"course",
 			);
 		}
 	}
