@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
-	function populateSelects(entities, dropdowns, placeholder) {
+	function populateSelectsHelper(entities, dropdowns, placeholder) {
 		dropdowns.forEach((dropdown) => {
 			dropdown.innerHTML = `<option value="" disabled selected>Select a ${placeholder}</option>`;
 
@@ -115,22 +115,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	);
 
 	// _________________________Display_________________________
-	const studentSearchForm = document.getElementById("studentSearchForm");
-	const studentSearchInput = document.getElementById("studentSearchInput");
-	const loadStudentsList = document.getElementById("loadStudentsList");
-	const loadStudentsMessage = document.getElementById("loadStudentsMessage");
+	const searchForm = document.getElementById("searchForm");
+
+	const sortOrderStudent = document.getElementById("sortOrderStudent");
+	const searchInputStudent = document.getElementById("searchInputStudent");
+	const studentFilterMessage = document.getElementById(
+		"studentFilterMessage",
+	);
+
+	const sortOrderGrade = document.getElementById("sortOrderGrade");
+	const searchSelectGrade = document.getElementById("searchSelectGrade");
+	const gradeFilterMessage = document.getElementById("gradeFilterMessage");
+
+	const sortOrderCourse = document.getElementById("sortOrderCourse");
+	const searchInputCourse = document.getElementById("searchInputCourse");
+	const courseFilterMessage = document.getElementById("courseFilterMessage");
 
 	const summaryAverageGrade = document.getElementById("summaryAverageGrade");
 	const summaryGradeDistribution = document.getElementById(
 		"summaryGradeDistribution",
 	);
 	const summaryMessage = document.getElementById("summaryMessage");
-
-	const studentFilterSelect = document.getElementById("studentFilterSelect");
-	const studentFilterInput = document.getElementById("studentFilterInput");
-	const studentFilterMessage = document.getElementById(
-		"studentFilterMessage",
-	);
 
 	// _________________________Student endpoints_________________________
 	studentCreateForm.addEventListener("submit", async (event) => {
@@ -403,35 +408,46 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	// _________________________Populate data_________________________
-	studentSearchForm.addEventListener("submit", async (event) => {
+	searchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
-		const searchValue = studentSearchInput.value;
+		const sortOrderStudent = sortOrderStudent.value;
+		const searchInputStudent = searchInputStudent.value;
+		const sortOrderGrade = sortOrderGrade.value;
+		const searchSelectGrade = searchSelectGrade.value;
+		const sortOrderCourse = sortOrderCourse.value;
+		const searchInputCourse = searchInputCourse.value;
 
-		loadStudents(searchValue);
+		loadStudents(
+			sortOrderStudent,
+			searchInputStudent,
+			sortOrderGrade,
+			searchSelectGrade,
+			sortOrderCourse,
+			searchInputCourse,
+		);
 	});
 
-	async function loadStudents(searchValue = "") {
+	async function loadStudents(
+		sortOrderStudent = "",
+		searchInputStudent = "",
+		sortOrderGrade = "",
+		searchSelectGrade = "",
+		sortOrderCourse = "",
+		searchInputCourse = "",
+	) {
 		const response = await sendRequest(
-			`/students?search_value=${encodeURIComponent(searchValue)}`,
+			`/students?` +
+				`sort_order_student=${encodeURIComponent(sortOrderStudent)}&` +
+				`search_input_student=${encodeURIComponent(searchInputStudent)}&` +
+				`sort_order_grade=${encodeURIComponent(sortOrderGrade)}&` +
+				`search_select_grade=${encodeURIComponent(searchSelectGrade)}&` +
+				`sort_order_course=${encodeURIComponent(sortOrderCourse)}&` +
+				`search_input_course=${encodeURIComponent(searchInputCourse)}`,
 		);
 		const students = await response.json();
 
 		if (response.ok) {
-			students.sort((a, b) => a.name.localeCompare(b.name));
-
-			populateSelects(
-				students,
-				[
-					studentDeleteSelect,
-					studentPatchSelect,
-					enrollmentCreateSelectStudent,
-					enrollmentDeleteSelectStudent,
-					enrollmentPatchSelectStudent,
-				],
-				"student",
-			);
-
 			loadStudentsList.innerHTML = "";
 
 			students.forEach((student) => {
@@ -487,14 +503,33 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	}
 
-	async function loadCourses() {
-		const response = await sendRequest("/courses");
+	async function populateSelects() {
+		const studentResponse = await sendRequest("/students");
+		const students = await response.json();
+
+		const courseResponse = await sendRequest("/courses");
 		const courses = await response.json();
 
-		if (response.ok) {
+		if (studentResponse.ok) {
+			students.sort((a, b) => a.name.localeCompare(b.name));
+
+			populateSelectsHelper(
+				students,
+				[
+					studentDeleteSelect,
+					studentPatchSelect,
+					enrollmentCreateSelectStudent,
+					enrollmentDeleteSelectStudent,
+					enrollmentPatchSelectStudent,
+				],
+				"student",
+			);
+		}
+
+		if (courseResponse.ok) {
 			courses.sort((a, b) => a.name.localeCompare(b.name));
 
-			populateSelects(
+			populateSelectsHelper(
 				courses,
 				[
 					courseDeleteSelect,
@@ -537,6 +572,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	loadStudents();
-	loadCourses();
+	populateSelects();
 	loadCourseSummary();
 });
