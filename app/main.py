@@ -23,14 +23,6 @@ def require_database_record(db, model, column, value):
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"{model.__name__} not found")
 
 
-def get_average_grade(db):
-    return (
-        db.query(func.avg(DBEnrollment.grade))
-        .filter(DBEnrollment.student_id == DBStudent.student_id)
-        .scalar()
-    )
-
-
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -83,7 +75,11 @@ def get_students(
 ):
     student_query = db.query(DBStudent)
 
-    average_grade = get_average_grade(db)
+    average_grade = (
+        db.query(func.avg(DBEnrollment.grade))
+        .filter(DBEnrollment.student_id == DBStudent.student_id)
+        .scalar_subquery()
+    )
 
     if search_input_student:
         student_query = student_query.filter(
@@ -383,6 +379,7 @@ def update_grade(
 def get_course_summary(db=Depends(get_db)):
     enrollments = db.query(DBEnrollment).all()
 
+    grade_total = 0
     grade_distribution = {
         "A": 0,
         "B": 0,
@@ -395,6 +392,8 @@ def get_course_summary(db=Depends(get_db)):
         if enrollment.grade is None:
             continue
 
+        grade_total += enrollment.grade
+
         if enrollment.grade >= 90:
             grade_distribution["A"] += 1
         elif enrollment.grade >= 80:
@@ -406,9 +405,13 @@ def get_course_summary(db=Depends(get_db)):
         else:
             grade_distribution["F"] += 1
 
+    grade_count = sum(grade_distribution.values())
+
+    average_grade = round(grade_total / grade_count, 2) if grade_count > 0 else None
+
     return {
         "count_grades": sum(grade_distribution.values()),
-        "average_grade": get_average_grade(db),
+        "average_grade": average_grade,
         "grade_distribution": [
             f"{grade}: {count}" for grade, count in grade_distribution.items()
         ],

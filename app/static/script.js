@@ -122,12 +122,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	const searchSelectGrade = document.getElementById("searchSelectGrade");
 	const searchInputCourse = document.getElementById("searchInputCourse");
 	const loadStudentsList = document.getElementById("loadStudentsList");
+	const loadStudentsMessage = document.getElementById("loadStudentsMessage");
 
 	const summaryCountGrades = document.getElementById("summaryCountGrades");
 	const summaryAverageGrade = document.getElementById("summaryAverageGrade");
 	const summaryGradeDistribution = document.getElementById(
 		"summaryGradeDistribution",
 	);
+	const summaryMessage = document.getElementById("summaryMessage");
 
 	sortOrderStudent.addEventListener("change", () => {
 		if (sortOrderStudent.value !== "") {
@@ -488,6 +490,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		} else {
 			loadStudentsList.innerHTML = "";
 		}
+
+		displayMessage(
+			loadStudentsMessage,
+			response.ok
+				? "Successfully loaded students."
+				: "Failed to load students.",
+			response.ok,
+		);
 	}
 
 	async function populateSelects() {
@@ -550,6 +560,14 @@ document.addEventListener("DOMContentLoaded", () => {
 				summaryGradeDistribution.appendChild(li);
 			});
 		}
+
+		displayMessage(
+			summaryMessage,
+			response.ok
+				? "Successfully loaded course summary."
+				: "Failed to load course summary.",
+			response.ok,
+		);
 	}
 
 	loadStudents("asc", "", "desc", "all", "");
