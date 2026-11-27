@@ -178,6 +178,7 @@
 				<h3>Student Filter</h3>
 				<label for="sortOrderStudent">Student Sort Order:</label>
 				<select id="sortOrderStudent" name="sortOrderStudent">
+					<option value="">No Sorting</option>
 					<option value="asc" selected>A - Z</option>
 					<option value="desc">Z - A</option>
 				</select>
@@ -187,51 +188,43 @@
 					id="searchInputStudent"
 					name="searchInputStudent"
 				/>
-				<p id="studentFilterMessage"></p>
 
 				<h3>Grade Filter</h3>
 				<label for="sortOrderGrade">Grade Sort Order:</label>
 				<select id="sortOrderGrade" name="sortOrderGrade">
+					<option value="">No Sorting</option>
 					<option value="desc" selected>Highest to Lowest</option>
 					<option value="asc">Lowest to Highest</option>
 				</select>
 				<label for="searchSelectGrade">Grade Search:</label>
 				<select id="searchSelectGrade" name="searchSelectGrade">
 					<option value="all" selected>All Grades</option>
-					<option value="A">A</option>
-					<option value="B">B</option>
-					<option value="C">C</option>
-					<option value="D">D</option>
-					<option value="F">F</option>
+					<option value="90-100">A</option>
+					<option value="80-89.99">B</option>
+					<option value="70-79.99">C</option>
+					<option value="60-69.99">D</option>
+					<option value="0-59.99">F</option>
 				</select>
-				<p id="gradeFilterMessage"></p>
 
 				<h3>Course Filter</h3>
-				<label for="sortOrderCourse">Course Sort Order:</label>
-				<select id="sortOrderCourse" name="sortOrderCourse">
-					<option value="asc" selected>A - Z</option>
-					<option value="desc">Z - A</option>
-				</select>
 				<label for="searchInputCourse">Course Search:</label>
 				<input
 					type="text"
 					id="searchInputCourse"
 					name="searchInputCourse"
 				/>
-				<p id="courseFilterMessage"></p>
 
 				<button type="submit">Search</button>
 			</form>
 			<ul id="loadStudentsList"></ul>
-			<p id="loadStudentsMessage"></p>
 		</section>
 
 		<section>
 			<h2>Course Summary</h2>
+			<p id="summaryCountGrades"></p>
 			<p id="summaryAverageGrade"></p>
 			<h3>Grade Distribution</h3>
 			<ul id="summaryGradeDistribution"></ul>
-			<p id="summaryMessage"></p>
 		</section>
 
 		<script type="module" src="/static/script.js"></script>

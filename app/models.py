@@ -1,6 +1,6 @@
 from sqlalchemy import String, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from app.database import Base
+from database import Base
 
 
 class DBStudent(Base):

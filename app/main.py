@@ -7,6 +7,7 @@ import uuid
 from database import SessionLocal
 from models import DBStudent, DBCourse, DBEnrollment
 import re
+from sqlalchemy import func, asc, desc
 
 
 def get_db():
@@ -20,6 +21,14 @@ def get_db():
 def require_database_record(db, model, column, value):
     if db.query(model).filter(column == value).one_or_none() is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"{model.__name__} not found")
+
+
+def get_average_grade(db):
+    return (
+        db.query(func.avg(DBEnrollment.grade))
+        .filter(DBEnrollment.student_id == DBStudent.student_id)
+        .scalar()
+    )
 
 
 app = FastAPI()
@@ -64,18 +73,56 @@ def get_root():
 
 
 @app.get("/students")
-def get_students(search_value: str | None = None, db=Depends(get_db)):
+def get_students(
+    sort_order_student: str = "asc",
+    search_input_student: str = "",
+    sort_order_grade: str = "desc",
+    search_select_grade: str = "all",
+    search_input_course: str = "",
+    db=Depends(get_db),
+):
     student_query = db.query(DBStudent)
 
-    if search_value:
+    average_grade = get_average_grade(db)
+
+    if search_input_student:
         student_query = student_query.filter(
-            DBStudent.student_name.ilike(f"%{search_value}%")
+            DBStudent.student_name.ilike(f"%{search_input_student}%")
         )
+
+    if search_select_grade != "all":
+        grade_range = search_select_grade.split("-")
+
+        student_query = student_query.filter(
+            average_grade.between(float(grade_range[0]), float(grade_range[1]))
+        )
+
+    if search_input_course:
+        student_query = (
+            student_query.join(DBEnrollment)
+            .join(DBCourse)
+            .filter(
+                DBCourse.course_name.ilike(f"%{search_input_course}%"),
+            )
+            .distinct()
+        )
+
+    if sort_order_grade == "asc":
+        student_query = student_query.order_by(asc(average_grade).nulls_last())
+
+    elif sort_order_student == "asc":
+        student_query = student_query.order_by(asc(DBStudent.student_name))
+
+    elif sort_order_student == "desc":
+        student_query = student_query.order_by(desc(DBStudent.student_name))
+
+    else:
+        student_query = student_query.order_by(desc(average_grade).nulls_last())
 
     students = student_query.all()
 
     if not students:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No students match your search.")
+        return []
 
     return [
         {
@@ -94,6 +141,9 @@ def get_students(search_value: str | None = None, db=Depends(get_db)):
                 .filter(DBEnrollment.student_id == student.student_id)
                 .all()
             ],
+            "avg_grade": db.query(func.avg(DBEnrollment.grade))
+            .filter(DBEnrollment.student_id == student.student_id)
+            .scalar(),
         }
         for student in students
     ]
@@ -333,7 +383,6 @@ def update_grade(
 def get_course_summary(db=Depends(get_db)):
     enrollments = db.query(DBEnrollment).all()
 
-    grade_total = 0
     grade_distribution = {
         "A": 0,
         "B": 0,
@@ -346,8 +395,6 @@ def get_course_summary(db=Depends(get_db)):
         if enrollment.grade is None:
             continue
 
-        grade_total += enrollment.grade
-
         if enrollment.grade >= 90:
             grade_distribution["A"] += 1
         elif enrollment.grade >= 80:
@@ -359,13 +406,9 @@ def get_course_summary(db=Depends(get_db)):
         else:
             grade_distribution["F"] += 1
 
-    grade_count = sum(grade_distribution.values())
-
-    if grade_count == 0:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No grades found to summarize.")
-
     return {
-        "average_grade": round(grade_total / grade_count, 2),
+        "count_grades": sum(grade_distribution.values()),
+        "average_grade": get_average_grade(db),
         "grade_distribution": [
             f"{grade}: {count}" for grade, count in grade_distribution.items()
         ],

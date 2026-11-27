@@ -29,14 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function getLetterGrade(grade) {
-		grade = grade.toFixed(2);
+		const formattedGrade = grade.toFixed(2);
 
-		if (grade >= 90) return `A - ${grade}%`;
-		if (grade >= 80) return `B - ${grade}%`;
-		if (grade >= 70) return `C - ${grade}%`;
-		if (grade >= 60) return `D - ${grade}%`;
+		if (grade >= 90) return `A - ${formattedGrade}%`;
+		if (grade >= 80) return `B - ${formattedGrade}%`;
+		if (grade >= 70) return `C - ${formattedGrade}%`;
+		if (grade >= 60) return `D - ${formattedGrade}%`;
 
-		return `F - ${grade}%`;
+		return `F - ${formattedGrade}%`;
 	}
 
 	// _________________________Student elements_________________________
@@ -116,26 +116,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// _________________________Display_________________________
 	const searchForm = document.getElementById("searchForm");
-
 	const sortOrderStudent = document.getElementById("sortOrderStudent");
 	const searchInputStudent = document.getElementById("searchInputStudent");
-	const studentFilterMessage = document.getElementById(
-		"studentFilterMessage",
-	);
-
 	const sortOrderGrade = document.getElementById("sortOrderGrade");
 	const searchSelectGrade = document.getElementById("searchSelectGrade");
-	const gradeFilterMessage = document.getElementById("gradeFilterMessage");
-
-	const sortOrderCourse = document.getElementById("sortOrderCourse");
 	const searchInputCourse = document.getElementById("searchInputCourse");
-	const courseFilterMessage = document.getElementById("courseFilterMessage");
+	const loadStudentsList = document.getElementById("loadStudentsList");
 
+	const summaryCountGrades = document.getElementById("summaryCountGrades");
 	const summaryAverageGrade = document.getElementById("summaryAverageGrade");
 	const summaryGradeDistribution = document.getElementById(
 		"summaryGradeDistribution",
 	);
-	const summaryMessage = document.getElementById("summaryMessage");
+
+	sortOrderStudent.addEventListener("change", () => {
+		if (sortOrderStudent.value !== "") {
+			sortOrderGrade.value = "desc";
+		}
+	});
+
+	sortOrderGrade.addEventListener("change", () => {
+		if (sortOrderGrade.value === "asc") {
+			sortOrderStudent.value = "";
+		}
+	});
 
 	// _________________________Student endpoints_________________________
 	studentCreateForm.addEventListener("submit", async (event) => {
@@ -411,39 +415,35 @@ document.addEventListener("DOMContentLoaded", () => {
 	searchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
-		const sortOrderStudent = sortOrderStudent.value;
-		const searchInputStudent = searchInputStudent.value;
-		const sortOrderGrade = sortOrderGrade.value;
-		const searchSelectGrade = searchSelectGrade.value;
-		const sortOrderCourse = sortOrderCourse.value;
-		const searchInputCourse = searchInputCourse.value;
+		const selectedSortOrderStudent = sortOrderStudent.value;
+		const selectedSearchInputStudent = searchInputStudent.value;
+		const selectedSortOrderGrade = sortOrderGrade.value;
+		const selectedSearchSelectGrade = searchSelectGrade.value;
+		const selectedSearchInputCourse = searchInputCourse.value;
 
 		loadStudents(
-			sortOrderStudent,
-			searchInputStudent,
-			sortOrderGrade,
-			searchSelectGrade,
-			sortOrderCourse,
-			searchInputCourse,
+			selectedSortOrderStudent,
+			selectedSearchInputStudent,
+			selectedSortOrderGrade,
+			selectedSearchSelectGrade,
+			selectedSearchInputCourse,
 		);
 	});
 
 	async function loadStudents(
-		sortOrderStudent = "",
-		searchInputStudent = "",
-		sortOrderGrade = "",
-		searchSelectGrade = "",
-		sortOrderCourse = "",
-		searchInputCourse = "",
+		selectedSortOrderStudent = "",
+		selectedSearchInputStudent = "",
+		selectedSortOrderGrade = "",
+		selectedSearchSelectGrade = "",
+		selectedSearchInputCourse = "",
 	) {
 		const response = await sendRequest(
 			`/students?` +
-				`sort_order_student=${encodeURIComponent(sortOrderStudent)}&` +
-				`search_input_student=${encodeURIComponent(searchInputStudent)}&` +
-				`sort_order_grade=${encodeURIComponent(sortOrderGrade)}&` +
-				`search_select_grade=${encodeURIComponent(searchSelectGrade)}&` +
-				`sort_order_course=${encodeURIComponent(sortOrderCourse)}&` +
-				`search_input_course=${encodeURIComponent(searchInputCourse)}`,
+				`sort_order_student=${encodeURIComponent(selectedSortOrderStudent)}&` +
+				`search_input_student=${encodeURIComponent(selectedSearchInputStudent)}&` +
+				`sort_order_grade=${encodeURIComponent(selectedSortOrderGrade)}&` +
+				`search_select_grade=${encodeURIComponent(selectedSearchSelectGrade)}&` +
+				`search_input_course=${encodeURIComponent(selectedSearchInputCourse)}`,
 		);
 		const students = await response.json();
 
@@ -461,14 +461,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				studentEmail.textContent = student.email;
 				li.appendChild(studentEmail);
 
-				let gradeSum = 0;
-				let gradeCount = 0;
-				student.enrollments.forEach((enrollment) => {
-					if (Number.isFinite(enrollment.grade)) {
-						gradeSum += enrollment.grade;
-						gradeCount++;
-					}
+				const courses = document.createElement("ul");
 
+				student.enrollments.forEach((enrollment) => {
 					const studentEnrollment = document.createElement("p");
 					const gradeDisplay =
 						enrollment.grade === null
@@ -476,15 +471,15 @@ document.addEventListener("DOMContentLoaded", () => {
 							: getLetterGrade(enrollment.grade);
 
 					studentEnrollment.textContent = `${enrollment.course_name}: ${gradeDisplay}`;
-					li.appendChild(studentEnrollment);
+					courses.appendChild(studentEnrollment);
 				});
+				li.appendChild(courses);
 
 				const avgGrade = document.createElement("p");
 				const avgDisplay =
-					gradeCount === 0
+					student.avg_grade === null
 						? "N/A"
-						: getLetterGrade(gradeSum / gradeCount);
-
+						: getLetterGrade(student.avg_grade);
 				avgGrade.textContent = `Average Grade: ${avgDisplay}`;
 				li.appendChild(avgGrade);
 
@@ -493,14 +488,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		} else {
 			loadStudentsList.innerHTML = "";
 		}
-
-		displayMessage(
-			loadStudentsMessage,
-			response.ok
-				? "Successfully loaded students."
-				: students.detail || "Failed to load students.",
-			response.ok,
-		);
 	}
 
 	async function populateSelects() {
@@ -548,12 +535,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		const courseSummary = await response.json();
 
 		if (response.ok) {
-			summaryAverageGrade.textContent = "";
-			summaryGradeDistribution.textContent = "";
+			summaryGradeDistribution.innerHTML = "";
 
-			summaryAverageGrade.textContent = `Average Grade: ${
-				courseSummary.average_grade
-			}%`;
+			summaryCountGrades.textContent = `Total Graded Enrollments: ${courseSummary.count_grades}`;
+
+			summaryAverageGrade.textContent =
+				courseSummary.average_grade === null
+					? "N/A"
+					: `Average Grade: ${getLetterGrade(courseSummary.average_grade)}`;
 
 			courseSummary.grade_distribution.forEach((grade) => {
 				const li = document.createElement("li");
@@ -561,17 +550,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				summaryGradeDistribution.appendChild(li);
 			});
 		}
-
-		displayMessage(
-			summaryMessage,
-			response.ok
-				? "Successfully loaded course summary."
-				: courseSummary.detail || "Failed to load course summary.",
-			response.ok,
-		);
 	}
 
-	loadStudents();
+	loadStudents("asc", "", "desc", "all", "");
 	populateSelects();
 	loadCourseSummary();
 });
