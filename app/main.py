@@ -7,7 +7,7 @@ import uuid
 from database import SessionLocal
 from models import DBStudent, DBCourse, DBEnrollment
 import re
-from sqlalchemy import func, asc, desc
+from sqlalchemy import func
 
 
 def get_db():
@@ -68,25 +68,36 @@ def get_root():
 def get_students(
     sort_order_student: str = "asc",
     search_input_student: str = "",
-    sort_order_grade: str = "desc",
+    sort_order_grade: str = "",
     search_select_grade: str = "all",
     search_input_course: str = "",
     db=Depends(get_db),
 ):
-    student_query = db.query(DBStudent)
+    search_input_student = search_input_student.strip()
+    search_input_course = search_input_course.strip()
 
     average_grade = (
         db.query(func.avg(DBEnrollment.grade))
         .filter(DBEnrollment.student_id == DBStudent.student_id)
+        .correlate(DBStudent)
         .scalar_subquery()
     )
+
+    enrollment_count = (
+        db.query(func.count(DBEnrollment.student_id))
+        .filter(DBEnrollment.student_id == DBStudent.student_id)
+        .correlate(DBStudent)
+        .scalar_subquery()
+    )
+
+    student_query = db.query(DBStudent)
 
     if search_input_student:
         student_query = student_query.filter(
             DBStudent.student_name.ilike(f"%{search_input_student}%")
         )
 
-    if search_select_grade != "all":
+    if search_select_grade not in ("all", ""):
         grade_range = search_select_grade.split("-")
 
         student_query = student_query.filter(
@@ -104,16 +115,24 @@ def get_students(
         )
 
     if sort_order_grade == "asc":
-        student_query = student_query.order_by(asc(average_grade).nulls_last())
+        student_query = student_query.order_by(
+            average_grade.is_(None),
+            (enrollment_count == 0),
+            average_grade.asc(),
+        )
+
+    elif sort_order_grade == "desc":
+        student_query = student_query.order_by(
+            average_grade.is_(None),
+            (enrollment_count == 0),
+            average_grade.desc(),
+        )
 
     elif sort_order_student == "asc":
-        student_query = student_query.order_by(asc(DBStudent.student_name))
-
-    elif sort_order_student == "desc":
-        student_query = student_query.order_by(desc(DBStudent.student_name))
+        student_query = student_query.order_by(DBStudent.student_name.asc())
 
     else:
-        student_query = student_query.order_by(desc(average_grade).nulls_last())
+        student_query = student_query.order_by(DBStudent.student_name.desc())
 
     students = student_query.all()
 
@@ -233,7 +252,7 @@ def update_student(student: StudentUpdate, student_id: str, db=Depends(get_db)):
 
 @app.get("/courses")
 def get_courses(db=Depends(get_db)):
-    courses = db.query(DBCourse).all()
+    courses = db.query(DBCourse).order_by(DBCourse.course_name.asc()).all()
 
     return [{"id": course.course_id, "name": course.course_name} for course in courses]
 

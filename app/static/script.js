@@ -133,13 +133,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	sortOrderStudent.addEventListener("change", () => {
 		if (sortOrderStudent.value !== "") {
+			sortOrderGrade.value = "";
+		} else if (sortOrderStudent.value === "") {
 			sortOrderGrade.value = "desc";
 		}
 	});
 
 	sortOrderGrade.addEventListener("change", () => {
-		if (sortOrderGrade.value === "asc") {
+		if (sortOrderGrade.value !== "") {
 			sortOrderStudent.value = "";
+		} else if (sortOrderGrade.value === "") {
+			sortOrderStudent.value = "asc";
 		}
 	});
 
@@ -159,7 +163,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (response.ok) {
 			studentCreateName.value = "";
 			studentCreateEmail.value = "";
-			await loadStudents();
+
+			await loadStudents(
+				sortOrderStudent.value,
+				searchInputStudent.value,
+				sortOrderGrade.value,
+				searchSelectGrade.value,
+				searchInputCourse.value,
+			);
 		}
 
 		displayMessage(
@@ -173,6 +184,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	studentDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (!studentDeleteSelect.value) {
+			displayMessage(
+				studentDeleteMessage,
+				"Please select a student.",
+				false,
+			);
+			return;
+		}
 
 		if (
 			!confirm(`Are you sure you want to delete ${
@@ -189,7 +209,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			await loadStudents();
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+				loadCourseSummary(),
+			]);
 		}
 
 		displayMessage(
@@ -203,6 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	studentPatchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (!studentPatchSelect.value) {
+			displayMessage(
+				studentPatchMessage,
+				"Please select a student.",
+				false,
+			);
+			return;
+		}
 
 		const student_id = studentPatchSelect.value;
 		const student_name = studentPatchName.value;
@@ -226,7 +265,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (response.ok) {
 			studentPatchName.value = "";
 			studentPatchEmail.value = "";
-			await loadStudents();
+
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+			]);
 		}
 
 		displayMessage(
@@ -249,7 +298,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		if (response.ok) {
 			courseCreateName.value = "";
-			await loadCourses();
+
+			await populateSelects();
 		}
 
 		displayMessage(
@@ -263,6 +313,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	courseDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (!courseDeleteSelect.value) {
+			displayMessage(
+				courseDeleteMessage,
+				"Please select a course.",
+				false,
+			);
+			return;
+		}
 
 		if (
 			!confirm(`Are you sure you want to delete ${
@@ -279,7 +338,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			await Promise.all([loadCourses(), loadStudents()]);
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+				loadCourseSummary(),
+			]);
 		}
 
 		displayMessage(
@@ -294,6 +363,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	coursePatchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
+		if (!coursePatchSelect.value) {
+			displayMessage(
+				coursePatchMessage,
+				"Please select a course.",
+				false,
+			);
+			return;
+		}
+
 		const course_id = coursePatchSelect.value;
 		const course_name = coursePatchName.value;
 
@@ -304,7 +382,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		if (response.ok) {
 			coursePatchName.value = "";
-			await Promise.all([loadCourses(), loadStudents()]);
+
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+			]);
 		}
 
 		displayMessage(
@@ -320,6 +408,24 @@ document.addEventListener("DOMContentLoaded", () => {
 	enrollmentCreateForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
+		if (!enrollmentCreateSelectStudent.value) {
+			displayMessage(
+				enrollmentCreateMessage,
+				"Please select a student.",
+				false,
+			);
+			return;
+		}
+
+		if (!enrollmentCreateSelectCourse.value) {
+			displayMessage(
+				enrollmentCreateMessage,
+				"Please select a course.",
+				false,
+			);
+			return;
+		}
+
 		const student_id = enrollmentCreateSelectStudent.value;
 		const course_id = enrollmentCreateSelectCourse.value;
 
@@ -330,7 +436,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			await loadStudents();
+			enrollmentCreateSelectStudent.value = "";
+			enrollmentCreateSelectCourse.value = "";
+
+			await loadStudents(
+				sortOrderStudent.value,
+				searchInputStudent.value,
+				sortOrderGrade.value,
+				searchSelectGrade.value,
+				searchInputCourse.value,
+			);
 		}
 
 		displayMessage(
@@ -344,6 +459,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	enrollmentDeleteForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (!enrollmentDeleteSelectStudent.value) {
+			displayMessage(
+				enrollmentDeleteMessage,
+				"Please select a student.",
+				false,
+			);
+			return;
+		}
+
+		if (!enrollmentDeleteSelectCourse.value) {
+			displayMessage(
+				enrollmentDeleteMessage,
+				"Please select a course.",
+				false,
+			);
+			return;
+		}
 
 		if (
 			!confirm(
@@ -367,7 +500,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			await loadStudents();
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+				loadCourseSummary(),
+			]);
 		}
 
 		displayMessage(
@@ -382,6 +525,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	enrollmentPatchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
+
+		if (!enrollmentPatchSelectStudent.value) {
+			displayMessage(
+				enrollmentPatchMessage,
+				"Please select a student.",
+				false,
+			);
+			return;
+		}
+
+		if (!enrollmentPatchSelectCourse.value) {
+			displayMessage(
+				enrollmentPatchMessage,
+				"Please select a course.",
+				false,
+			);
+			return;
+		}
 
 		const student_id = enrollmentPatchSelectStudent.value;
 		const course_id = enrollmentPatchSelectCourse.value;
@@ -401,7 +562,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			await loadStudents();
+			await Promise.all([
+				loadStudents(
+					sortOrderStudent.value,
+					searchInputStudent.value,
+					sortOrderGrade.value,
+					searchSelectGrade.value,
+					searchInputCourse.value,
+				),
+				populateSelects(),
+				loadCourseSummary(),
+			]);
 		}
 
 		displayMessage(
@@ -417,18 +588,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	searchForm.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
-		const selectedSortOrderStudent = sortOrderStudent.value;
-		const selectedSearchInputStudent = searchInputStudent.value;
-		const selectedSortOrderGrade = sortOrderGrade.value;
-		const selectedSearchSelectGrade = searchSelectGrade.value;
-		const selectedSearchInputCourse = searchInputCourse.value;
-
 		loadStudents(
-			selectedSortOrderStudent,
-			selectedSearchInputStudent,
-			selectedSortOrderGrade,
-			selectedSearchSelectGrade,
-			selectedSearchInputCourse,
+			sortOrderStudent.value,
+			searchInputStudent.value,
+			sortOrderGrade.value,
+			searchSelectGrade.value,
+			searchInputCourse.value,
 		);
 	});
 
@@ -502,14 +667,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	async function populateSelects() {
 		const studentResponse = await sendRequest("/students");
-		const students = await response.json();
+		const students = await studentResponse.json();
 
 		const courseResponse = await sendRequest("/courses");
-		const courses = await response.json();
+		const courses = await courseResponse.json();
 
 		if (studentResponse.ok) {
-			students.sort((a, b) => a.name.localeCompare(b.name));
-
 			populateSelectsHelper(
 				students,
 				[
@@ -524,8 +687,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		if (courseResponse.ok) {
-			courses.sort((a, b) => a.name.localeCompare(b.name));
-
 			populateSelectsHelper(
 				courses,
 				[
@@ -570,7 +731,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	}
 
-	loadStudents("asc", "", "desc", "all", "");
+	loadStudents("asc", "", "", "all", "");
 	populateSelects();
 	loadCourseSummary();
 });

@@ -1,0 +1,192 @@
+1. STUDENT MANAGEMENT
+
+[X] Create a student with a valid name and email.
+[X] Create multiple students.
+[X] Verify each student receives a unique ID.
+[X] Verify newly created students appear in the student list.
+[X] Attempt to create a student with a missing name.
+[X] Attempt to create a student with a missing email.
+[X] Attempt to create a student with an invalid email format.
+[X] Attempt to create a student with a missing name and email.
+[X] Attempt to create a student with an email already in use.
+[X] Verify invalid student creation returns an appropriate error.
+[X] Verify student information persists after restarting the application.
+
+2. COURSE MANAGEMENT
+
+[X] Create a course with a valid name.
+[X] Create multiple courses.
+[X] Verify each course receives a unique ID.
+[X] Verify newly created courses appear in the course list.
+[X] Attempt to create a course with a missing name.
+[X] Verify invalid course creation returns an appropriate error.
+[X] Verify course information persists after restarting the application.
+
+3. STUDENT ENROLLMENT
+
+[X] Enroll a student in an existing course.
+[X] Enroll multiple students in the same course.
+[X] Enroll one student in multiple courses.
+[X] Verify students with the same name can be enrolled in the same course.
+[X] Verify enrollments appear under the correct student.
+[X] Attempt to enroll a student in the same course twice.
+[X] Verify invalid enrollment requests return appropriate errors.
+[X] Verify enrollment information persists after restarting the application.
+
+4. GRADE MANAGEMENT
+
+[X] Assign a valid grade to an existing enrollment.
+[X] Update an existing grade.
+[X] Verify the updated grade is displayed correctly.
+[X] Assign a grade of 0.
+[X] Assign a grade of 100.
+[X] Attempt to assign a negative grade.
+[X] Attempt to assign a grade greater than 100.
+[X] Attempt to assign a nonnumeric grade.
+[X] Attempt to assign a grade to a nonexistent enrollment.
+[X] Attempt to submit a grade with a missing value.
+[X] Verify invalid grade requests return appropriate errors.
+[X] Verify grade information persists after restarting the application.
+
+5. STUDENT LIST AND DISPLAY
+
+[X] Verify all students are displayed.
+[X] Verify student names are displayed correctly.
+[X] Verify student emails are displayed correctly.
+[X] Verify each student's enrolled courses are displayed.
+[X] Verify each enrollment's grade is displayed correctly.
+[X] Verify ungraded enrollments display "Not graded".
+[X] Verify student averages are calculated correctly.
+[X] Verify students without graded enrollments display the appropriate average "N/A".
+[X] Verify students without enrollments display correctly.
+[X] Verify the list updates after creating a student.
+[X] Verify the list updates after enrolling a student.
+[X] Verify the list updates after changing a grade.
+[X] Verify an empty student list displays appropriately.
+
+6. STUDENT SEARCH
+
+[X] Search for a student using their full name.
+[X] Search for a student using part of their name.
+[X] Search using different capitalization.
+[X] Search using a name that does not exist.
+[X] Search using an empty search field.
+[X] Search using spaces or leading/trailing whitespace.
+[X] Verify searching does not modify student records.
+[X] Verify search works alongside the sorting controls.
+
+7. STUDENT SORTING AND FILTERING
+
+[X] Sort students by name in ascending order.
+[X] Sort students by name in descending order.
+[X] Verify alphabetical sorting works with uppercase and lowercase names.
+[X] Sort students by average grade in ascending order.
+[X] Sort students by average grade in descending order.
+[X] Verify students with no grades appear at the bottom when sorting by grade.
+[X] Filter students using each available grade range.
+[X] Verify students outside the selected grade range are excluded.
+[X] Filter students by course name.
+[X] Filter using part of a course name.
+[X] Filter using different capitalization.
+[X] Search for a course that does not exist.
+[X] Verify students enrolled in multiple matching courses do not appear more than once.
+[X] Verify sorting and filtering work together correctly.
+[X] Verify resetting filters restores the expected student list and default sorting.
+
+8. COURSE SUMMARY
+
+[X] Verify the course summary loads successfully.
+[X] Verify the total graded enrollment count is correct.
+[X] Verify ungraded enrollments are excluded from the graded enrollment count.
+[X] Verify the overall average grade is calculated correctly.
+[X] Verify the average is rounded to 2 decimal places.
+[X] Verify the letter-grade distribution is correct.
+[X] Verify each graded enrollment is counted exactly once.
+[X] Verify ungraded enrollments are excluded from the grade distribution.
+[X] Verify the summary handles a database with no enrollments.
+[X] Verify the summary handles enrollments with no grades.
+[X] Verify the summary handles a database with no students or courses.
+[X] Verify the summary updates after assigning a grade.
+[X] Verify the summary updates after changing a grade.
+
+9. DELETION AND DESTRUCTIVE ACTIONS
+
+[X] Verify deleting a student asks for confirmation.
+[X] Confirm deletion of a student.
+[X] Cancel deletion of a student.
+[X] Verify a deleted student no longer appears in the list.
+[X] Verify associated enrollments are deleted when a student is deleted.
+[X] Verify deleting a course asks for confirmation.
+[X] Confirm deletion of a course.
+[X] Cancel deletion of a course.
+[X] Verify a deleted course no longer appears in the list.
+[X] Verify associated enrollments are deleted when a course is deleted.
+
+
+10. FRONTEND AND USER INTERFACE
+
+[X] Verify all forms submit without reloading the page.
+[X] Verify success messages appear after successful operations.
+[X] Verify error messages appear after failed operations.
+[X] Verify error messages explain what went wrong.
+[X] Verify form inputs clear or reset appropriately after successful submissions.
+[X] Verify form inputs retain their values after failed submissions when appropriate.
+[X] Verify dropdowns populate with the correct students and courses.
+[X] Verify dropdowns handle empty student or course lists.
+[X] Verify all displayed information is current after database changes.
+[X] Verify there are no JavaScript errors in the browser console.
+[X] Verify there are no Python errors or tracebacks in the backend terminal.
+[X] Verify the application works after refreshing the page.
+
+11. KEYBOARD ACCESSIBILITY
+
+[X] Navigate the entire application using only the keyboard.
+[X] Verify Tab moves through interactive elements in a logical order.
+[X] Verify Shift + Tab moves backward through interactive elements.
+[X] Verify Enter activates buttons and submits forms where appropriate.
+[X] Verify dropdowns can be operated using the keyboard.
+[X] Verify all interactive elements have visible focus indicators.
+[X] Verify all form inputs have associated labels.
+[X] Verify destructive actions can be confirmed or canceled using the keyboard.
+[X] Verify color is not the only way information or status is communicated.
+
+12. BACKEND AND API
+
+[X] Verify the FastAPI application starts without errors.
+[X] Verify all required API endpoints respond correctly.
+[X] Verify successful creation requests return HTTP 201.
+[X] Verify requests for nonexistent students or courses return HTTP 404 where appropriate.
+[X] Verify malformed requests return HTTP 400 where appropriate.
+[X] Verify invalid data is rejected by the backend.
+[X] Verify the backend returns valid JSON responses.
+[X] Verify GET requests do not unintentionally modify database records.
+[X] Verify POST requests create records correctly.
+[X] Verify PATCH requests update the intended records.
+[X] Verify query parameters work correctly for search, sorting, and filtering.
+[X] Verify the API handles empty database results without crashing.
+[X] Verify database sessions are properly closed after requests.
+[X] Verify the backend remains functional after multiple consecutive requests.
+
+13. DATABASE INTEGRITY
+
+[X] Verify student IDs are unique.
+[X] Verify course IDs are unique.
+[X] Verify enrollment foreign keys reference existing students and courses.
+[X] Verify duplicate enrollments are prevented if required.
+[X] Verify grades are stored as numeric values.
+[X] Verify ungraded enrollments are stored as NULL.
+[X] Verify updating a grade does not create another enrollment.
+[X] Verify database relationships work correctly.
+[X] Verify all records remain consistent after restarting the application.
+
+Final review
+
+[X] All required assignment features work.
+[X] All validation tests pass.
+[X] All sorting and filtering tests pass.
+[X] All keyboard accessibility tests pass.
+[X] No browser console errors.
+[X] No backend errors or tracebacks.
+[X] No unintended database records or duplicate data.
+[ ] CSS layout is clean and consistent.
+[ ] Application is ready for submission.

@@ -10,7 +10,7 @@
 		<h1>University Grade Entry System</h1>
 
 		<!-- _________________________STUDENT_________________________ -->
-		<form id="studentCreateForm">
+		<form id="studentCreateForm" novalidate>
 			<label for="studentCreateName">Student Name:</label>
 			<input
 				type="text"
@@ -29,7 +29,7 @@
 		</form>
 		<p id="studentCreateMessage"></p>
 
-		<form id="studentDeleteForm">
+		<form id="studentDeleteForm" novalidate>
 			<label for="studentDeleteSelect">Student:</label>
 			<select
 				id="studentDeleteSelect"
@@ -42,7 +42,7 @@
 		</form>
 		<p id="studentDeleteMessage"></p>
 
-		<form id="studentPatchForm">
+		<form id="studentPatchForm" novalidate>
 			<label for="studentPatchSelect">Student:</label>
 			<select id="studentPatchSelect" name="studentPatchSelect" required>
 				<option value="" disabled selected>Select a student</option>
@@ -60,7 +60,7 @@
 		<p id="studentPatchMessage"></p>
 
 		<!-- _________________________COURSE_________________________ -->
-		<form id="courseCreateForm">
+		<form id="courseCreateForm" novalidate>
 			<label for="courseCreateName">Course Name:</label>
 			<input
 				type="text"
@@ -72,7 +72,7 @@
 		</form>
 		<p id="courseCreateMessage"></p>
 
-		<form id="courseDeleteForm">
+		<form id="courseDeleteForm" novalidate>
 			<label for="courseDeleteSelect">Course:</label>
 			<select id="courseDeleteSelect" name="courseDeleteSelect" required>
 				<option value="" disabled selected>Select a course</option>
@@ -81,7 +81,7 @@
 		</form>
 		<p id="courseDeleteMessage"></p>
 
-		<form id="coursePatchForm">
+		<form id="coursePatchForm" novalidate>
 			<label for="coursePatchSelect">Course:</label>
 			<select id="coursePatchSelect" name="coursePatchSelect" required>
 				<option value="" disabled selected>Select a course</option>
@@ -98,7 +98,7 @@
 		<p id="coursePatchMessage"></p>
 
 		<!-- _________________________ENROLLMENT_________________________ -->
-		<form id="enrollmentCreateForm">
+		<form id="enrollmentCreateForm" novalidate>
 			<label for="enrollmentCreateSelectStudent">Student:</label>
 			<select
 				id="enrollmentCreateSelectStudent"
@@ -119,7 +119,7 @@
 		</form>
 		<p id="enrollmentCreateMessage"></p>
 
-		<form id="enrollmentDeleteForm">
+		<form id="enrollmentDeleteForm" novalidate>
 			<label for="enrollmentDeleteSelectStudent">Student:</label>
 			<select
 				id="enrollmentDeleteSelectStudent"
@@ -140,7 +140,7 @@
 		</form>
 		<p id="enrollmentDeleteMessage"></p>
 
-		<form id="enrollmentPatchForm">
+		<form id="enrollmentPatchForm" novalidate>
 			<label for="enrollmentPatchSelectStudent">Student:</label>
 			<select
 				id="enrollmentPatchSelectStudent"
@@ -174,7 +174,7 @@
 		<!-- _________________________DISPLAY_________________________ -->
 		<section>
 			<h2>Student Search & Filtering</h2>
-			<form id="searchForm">
+			<form id="searchForm" novalidate>
 				<h3>Student Filter</h3>
 				<label for="sortOrderStudent">Student Sort Order:</label>
 				<select id="sortOrderStudent" name="sortOrderStudent">
@@ -192,8 +192,8 @@
 				<h3>Grade Filter</h3>
 				<label for="sortOrderGrade">Grade Sort Order:</label>
 				<select id="sortOrderGrade" name="sortOrderGrade">
-					<option value="">No Sorting</option>
-					<option value="desc" selected>Highest to Lowest</option>
+					<option value="" selected>No Sorting</option>
+					<option value="desc">Highest to Lowest</option>
 					<option value="asc">Lowest to Highest</option>
 				</select>
 				<label for="searchSelectGrade">Grade Search:</label>
